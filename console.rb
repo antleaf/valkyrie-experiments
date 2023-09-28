@@ -3,7 +3,6 @@
 
 require './configure'
 require './model'
-require 'rails'
 
 source_file_path = "#{LOCAL_DATA_FOR_UPLOADS_FOLDER}/the-hills.jpg"
 file_name = 'the-hills.jpg'
@@ -39,6 +38,6 @@ end
 # upload_file_to_disk_using_valkyrie_only(source_file_path, image_resource, file_name)
 # upload_file_to_disk_using_shrine_only(source_file_path, image_resource)
 # upload_file_to_disk_using_valkyrie_shrine(source_file_path, image_resource, file_name)
-upload_file_to_s3_using_shrine_only(source_file_path, image_resource)
-# upload_file_to_s3_using_valkyrie_shrine(source_file_path, image_resource, file_name)
+# upload_file_to_s3_using_shrine_only(source_file_path, image_resource)
+upload_file_to_s3_using_valkyrie_shrine(source_file_path, image_resource, file_name)
 
