@@ -5,56 +5,40 @@ require './configure'
 require './model'
 require 'rails'
 
-def without_shrine
-  metadata_adapter = Valkyrie::MetadataAdapter.find(:memory)
+source_file_path = "#{LOCAL_DATA_FOR_UPLOADS_FOLDER}/the-hills.jpg"
+file_name = 'the-hills.jpg'
+file_id = 'file_id'
+metadata_adapter = Valkyrie::MetadataAdapter.find(:memory)
+image_resource = metadata_adapter.persister.save(resource: ImageFileResource.new(title: 'The Hills', file_identifiers: [file_id]))
+
+def upload_file_to_disk_using_valkyrie_only(source, resource, original_file_name)
   storage_adapter = Valkyrie::StorageAdapter.find(:disk)
-
-  file_name = "the-hills.jpg"
-  file_id = "#{STORAGE_FOLDER}/#{file_name}"
-
-  image_resource = ImageFileResource.new(
-    title: 'The Hills',
-    file_identifiers: [file_id]
-  )
-
-  upload = ActionDispatch::Http::UploadedFile.new tempfile: File.new("#{LOCAL_DATA_FOR_UPLOADS_FOLDER}/#{file_name}"), filename: file_name, type: 'image/jpeg'
-  file = storage_adapter.upload(file: upload, resource: image_resource, original_filename: file_name)
-  image_resource = metadata_adapter.persister.save(resource: image_resource)
-
-  ir = metadata_adapter.query_service.find_by(id: image_resource.id)
-  puts "Retrieved Image Resource Metadata = #{ir.inspect}"
-
-  file = storage_adapter.find_by(id: "disk://#{ir.file_identifiers.first}")
-  puts file.inspect
+  storage_adapter.upload(file: File.new(source), resource: resource, original_filename: original_file_name)
 end
 
-def with_shrine
-  metadata_adapter = Valkyrie::MetadataAdapter.find(:memory)
+def upload_file_to_disk_using_shrine_only(source, resource)
+  storage_adapter = Shrine.storages[:file]
+  storage_adapter.upload(File.new(source), resource.id.to_s)
+end
+
+def upload_file_to_disk_using_valkyrie_shrine(source, resource, original_file_name)
   storage_adapter = Valkyrie::StorageAdapter.find(:shrine_disk)
-  puts storage_adapter.inspect
-
-
-  file_name = "the-hills.jpg"
-  file_id = "#{STORAGE_FOLDER}/#{file_name}"
-
-  image_resource = ImageFileResource.new(
-    title: 'The Hills',
-    file_identifiers: [file_id]
-  )
-  upload = ActionDispatch::Http::UploadedFile.new tempfile: File.new("#{LOCAL_DATA_FOR_UPLOADS_FOLDER}/#{file_name}"), filename: file_name, type: 'image/jpeg'
-  file = storage_adapter.upload(file: upload, original_filename: file_name, resource: image_resource )
-
-  # upload = ActionDispatch::Http::UploadedFile.new tempfile: File.new("#{LOCAL_DATA_FOR_UPLOADS_FOLDER}/#{file_name}"), filename: file_name, type: 'image/jpeg'
-  # file = storage_adapter.upload(file: upload, resource: image_resource, original_filename: file_name)
-  # image_resource = metadata_adapter.persister.save(resource: image_resource)
-  #
-  # ir = metadata_adapter.query_service.find_by(id: image_resource.id)
-  # puts "Retrieved Image Resource Metadata = #{ir.inspect}"
-  #
-  # file = storage_adapter.find_by(id: "disk://#{ir.file_identifiers.first}")
-  # puts file.inspect
+  storage_adapter.upload(file: File.new(source), resource: resource, original_filename: original_file_name)
 end
 
+def upload_file_to_s3_using_shrine_only(source, resource)
+  storage_adapter = Shrine.storages[:s3]
+  storage_adapter.upload(File.new(source), resource.id.to_s)
+end
 
-# without_shrine
-with_shrine
+def upload_file_to_s3_using_valkyrie_shrine(source, resource, original_file_name)
+  storage_adapter = Valkyrie::StorageAdapter.find(:shrine_s3)
+  storage_adapter.upload(file: File.new(source), resource: resource, original_filename: original_file_name)
+end
+
+# upload_file_to_disk_using_valkyrie_only(source_file_path, image_resource, file_name)
+# upload_file_to_disk_using_shrine_only(source_file_path, image_resource)
+# upload_file_to_disk_using_valkyrie_shrine(source_file_path, image_resource, file_name)
+upload_file_to_s3_using_shrine_only(source_file_path, image_resource)
+# upload_file_to_s3_using_valkyrie_shrine(source_file_path, image_resource, file_name)
+

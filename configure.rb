@@ -18,15 +18,6 @@ Valkyrie::MetadataAdapter.register(
   :memory
 )
 
-# simple storage adapter - just uses local disk
-Valkyrie::StorageAdapter.register(
-  Valkyrie::Storage::Disk.new(
-    base_path: STORAGE_FOLDER,
-    file_mover: FileUtils.method(:cp)
-  ),
-  :disk
-)
-
 s3_client = Aws::S3::Client.new(
   region: 'eu-central-1',
   endpoint: 'https://eu-central-1.linodeobjects.com',
@@ -42,11 +33,20 @@ s3_options = {
 }
 
 Shrine.storages = {
-  # file: Shrine::Storage::FileSystem.new(STORAGE_FOLDER, prefix: "/"),
+  file: Shrine::Storage::FileSystem.new(STORAGE_FOLDER, prefix: "/"),
   s3: Shrine::Storage::S3.new(client: s3_client, **s3_options)
 }
 
 
 Valkyrie::StorageAdapter.register(
-  Valkyrie::Storage::Shrine.new(Shrine.storages[:s3]), :shrine_disk
+  Valkyrie::Storage::Shrine.new(Shrine.storages[:file]), :shrine_disk
+)
+
+Valkyrie::StorageAdapter.register(
+  Valkyrie::Storage::Shrine.new(Shrine.storages[:s3]), :shrine_s3
+)
+
+# simple Valyrie storage adapter - just uses local disk
+Valkyrie::StorageAdapter.register(
+  Valkyrie::Storage::Disk.new(base_path: STORAGE_FOLDER, file_mover: FileUtils.method(:cp)), :disk
 )

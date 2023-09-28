@@ -11,10 +11,10 @@ The eventual goal is to test:
 This is being approached with gradual steps:
 
 - [x] Test 'native' Valkyrie file-system adapter with local disk storage (status: **success**)
-- [x] Test Valkyrie-Shrine file-system adapter with local disk storage (status: **failure**)
-- [x] Test Valkyrie-Shrine S3 adapter with Linode S3 interface (status: **failure**)
+- [x] Test Shrine file-system (without Valkyrie) with local disk storage (status: **success**)
+- [x] Test Valkyrie-Shrine file-system adapter with local disk storage (status: **success**)
+- [x] Test Shrine S3 adapter (without Valkyrie) with Linode S3 interface (status: **success**)
+- [x] Test Valkyrie-Shrine S3 adapter with Linode S3 interface (status: **success**)
 - [ ] Test Valkyrie-Shrine file-system adapter with MS Azure Object store via NFS
 - [ ] Test Valkyrie-Shrine S3 adapter with MinIO S3 interface running on MS Azure AKS service
 
-### Progress
-Have not yet managed to get any Valkyrie-Shrine adapter to work.
