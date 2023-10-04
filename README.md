@@ -18,5 +18,3 @@ This is being approached with gradual steps:
 - [ ] Test Valkyrie-Shrine file-system adapter with MS Azure Object store via NFS
 - [ ] Test Valkyrie-Shrine S3 adapter with MinIO S3 interface running on MS Azure AKS service
 
-> [!note]
-> some note text
